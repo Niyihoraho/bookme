@@ -36,3 +36,6 @@ markdown/
 # Server configuration (contains sensitive data)
 ecosystem.config.js
 frontend-server.js
+
+# Old deployment scripts folder
+in-nextjs/
