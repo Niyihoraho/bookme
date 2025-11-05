@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import Swal from 'sweetalert2';
 import Footer from './Footer';
 import { FaTag, FaImage, FaFileAlt, FaMoneyBill, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
+import { API_BASE_URL } from '../config/api';
 
 const AddService = ({ isLoggedIn, email }) => {
   const [formData, setFormData] = useState({
@@ -66,7 +67,7 @@ const AddService = ({ isLoggedIn, email }) => {
       const data = new FormData();
       data.append('file', formData.images);
       try {
-        const res = await fetch('http://localhost:3000/api/v1/upload', {
+        const res = await fetch('${API_BASE_URL}/upload', {
           method: 'POST',
           body: data,
         });
@@ -132,7 +133,7 @@ const AddService = ({ isLoggedIn, email }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/v1/servises', {
+      const response = await fetch('${API_BASE_URL}/servises', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

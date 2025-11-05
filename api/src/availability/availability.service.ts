@@ -20,6 +20,7 @@ export class AvailabilityService {
         reason: createAvailabilityDto.reason,
         emergency: createAvailabilityDto.emergency ?? false,
         duration: createAvailabilityDto.duration,
+        updatedAt: new Date(),
       },
     });
     return this.mapAvailability(availability);
@@ -28,7 +29,7 @@ export class AvailabilityService {
   // Get all availability records
   async findAll() {
     const availabilities = await this.prisma.availability.findMany({
-      include: { user: true },
+      include: { User: true },
       orderBy: { createdAt: 'desc' },
     });
     return availabilities.map(this.mapAvailability);
@@ -38,7 +39,7 @@ export class AvailabilityService {
   async findOne(id: number) {
     const availability = await this.prisma.availability.findUnique({
       where: { id },
-      include: { user: true },
+      include: { User: true },
     });
     if (!availability) {
       throw new NotFoundException(`Availability with ID ${id} not found`);

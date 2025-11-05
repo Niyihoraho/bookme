@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { API_BASE_URL } from '../config/api';
 
 export default function ProfileView() {
   const [user, setUser] = useState(null);
@@ -11,11 +12,11 @@ export default function ProfileView() {
       setLoading(true);
       try {
         // Get userId from session
-        const sessionRes = await fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' });
+        const sessionRes = await fetch('${API_BASE_URL}/login/me', { credentials: 'include' });
         const sessionData = await sessionRes.json();
         if (!sessionData.userId) throw new Error('Session expired. Please log in again.');
         // Fetch full user info
-        const res = await fetch(`http://localhost:3000/api/v1/user/${sessionData.userId}`);
+        const res = await fetch(`${API_BASE_URL}/user/${sessionData.userId}`);
         if (!res.ok) throw new Error('Failed to fetch user');
         const data = await res.json();
         setUser(data);

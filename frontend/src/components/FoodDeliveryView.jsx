@@ -4,6 +4,7 @@ import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL, API_UPLOAD_URL } from '../config/api';
 
 const FoodDeliveryView = ({ email }) => {
   const [foods, setFoods] = useState([]);
@@ -26,7 +27,7 @@ const FoodDeliveryView = ({ email }) => {
 
   // Fetch user info (get userId and email)
   useEffect(() => {
-    fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' })
+    fetch('${API_BASE_URL}/login/me', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         setUserEmail(data?.email || '');
@@ -38,7 +39,7 @@ const FoodDeliveryView = ({ email }) => {
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
-    fetch('http://localhost:3000/api/v1/food-delivery', { credentials: 'include' })
+    fetch('${API_BASE_URL}/food-delivery', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         // Filter foods by userId (owner only)
@@ -66,7 +67,7 @@ const FoodDeliveryView = ({ email }) => {
       food.foodImage
         ? food.foodImage.startsWith('http')
           ? food.foodImage
-          : `http://localhost:3000/uploads/${food.foodImage}`
+          : `${API_UPLOAD_URL}/${food.foodImage}`
         : ''
     );
     setEditModal(true);
@@ -97,7 +98,7 @@ const FoodDeliveryView = ({ email }) => {
       const data = new FormData();
       data.append('file', editForm.imageFile);
       try {
-        const res = await fetch('http://localhost:3000/api/v1/upload', {
+        const res = await fetch('${API_BASE_URL}/upload', {
           method: 'POST',
           body: data,
         });
@@ -118,7 +119,7 @@ const FoodDeliveryView = ({ email }) => {
         ingredients: editForm.ingredients,
         foodDescription: editForm.foodDescription,
       };
-      const res = await fetch(`http://localhost:3000/api/v1/food-delivery/${editFood.id}`, {
+      const res = await fetch(`${API_BASE_URL}/food-delivery/${editFood.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateFields),
@@ -153,7 +154,7 @@ const FoodDeliveryView = ({ email }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const res = await fetch(`http://localhost:3000/api/v1/food-delivery/${food.id}`, {
+          const res = await fetch(`${API_BASE_URL}/food-delivery/${food.id}`, {
             method: 'DELETE',
             credentials: 'include',
           });
@@ -225,7 +226,7 @@ const FoodDeliveryView = ({ email }) => {
                           src={
                             food.foodImage.startsWith('http')
                               ? food.foodImage
-                              : `http://localhost:3000/uploads/${food.foodImage}`
+                              : `${API_UPLOAD_URL}/${food.foodImage}`
                           }
                           alt={food.name}
                           className="w-16 h-16 rounded object-cover"

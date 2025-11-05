@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import { FaUser, FaBuilding, FaPhone, FaEnvelope } from 'react-icons/fa';
+import { API_BASE_URL } from '../config/api';
 
 export default function UserProfile() {
   const [user, setUser] = useState({
@@ -24,12 +25,12 @@ export default function UserProfile() {
     const fetchUser = async () => {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' });
+        const res = await fetch('${API_BASE_URL}/login/me', { credentials: 'include' });
         if (!res.ok) throw new Error('Failed to fetch user session');
         const data = await res.json();
         if (!data.userId) throw new Error('Session expired. Please log in again.');
         // Fetch full user info
-        const userRes = await fetch(`http://localhost:3000/api/v1/user/${data.userId}`);
+        const userRes = await fetch(`${API_BASE_URL}/user/${data.userId}`);
         if (!userRes.ok) throw new Error('Failed to fetch user profile');
         const userData = await userRes.json();
         setUser({
@@ -69,7 +70,7 @@ export default function UserProfile() {
       const formData = new FormData();
       formData.append('file', imageFile);
       try {
-        const uploadRes = await fetch('http://localhost:3000/api/v1/upload', {
+        const uploadRes = await fetch('${API_BASE_URL}/upload', {
           method: 'POST',
           body: formData,
         });
@@ -85,13 +86,13 @@ export default function UserProfile() {
 
     try {
       // Get userId from session
-      const sessionRes = await fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' });
+      const sessionRes = await fetch('${API_BASE_URL}/login/me', { credentials: 'include' });
       const sessionData = await sessionRes.json();
       if (!sessionData.userId) throw new Error('Session expired. Please log in again.');
       const userId = sessionData.userId;
 
       const { username, businessName, phone, email } = user;
-      const res = await fetch(`http://localhost:3000/api/v1/user/${userId}`, {
+      const res = await fetch(`${API_BASE_URL}/user/${userId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

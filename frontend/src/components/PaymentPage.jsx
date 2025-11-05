@@ -5,6 +5,7 @@ import { FaShoppingCart, FaUser, FaEnvelope, FaCalendarAlt, FaPhone, FaTrash, Fa
 import Swal from 'sweetalert2';
 import logo from '../assets/LOGO-SERVICE.png';
 import Footer from './Footer';
+import { API_BASE_URL, API_UPLOAD_URL } from '../config/api';
 
 // Helper to calculate price + 15%
 const getPriceWithFee = (price) => {
@@ -49,7 +50,7 @@ const validateEmail = (email) =>
 
 const checkFoodDeliveryAvailability = async (providerId, datetime) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/v1/availability/user/${providerId}`, { credentials: 'include' });
+    const res = await fetch(`${API_BASE_URL}/availability/user/${providerId}`, { credentials: 'include' });
     if (!res.ok) return { available: false, reason: 'Could not check provider availability.' };
     const availabilities = await res.json();
     if (!Array.isArray(availabilities) || availabilities.length === 0) {
@@ -258,7 +259,7 @@ const PaymentPage = () => {
 
         const updateStatus = async () => {
           try {
-            const res = await fetch(`http://localhost:3000/api/v1/payments/${paymentId}`);
+            const res = await fetch(`${API_BASE_URL}/payments/${paymentId}`);
             const data = await res.json();
             if (data.status === 'paid' || data.status === 'done') {
               statusText = '<span style="color:#32CD32;">Payment successful! Thank you for your order.</span>';
@@ -411,7 +412,7 @@ const PaymentPage = () => {
     };
 
     try {
-      const res = await fetch('http://localhost:3000/api/v1/payments', {
+      const res = await fetch('${API_BASE_URL}/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -557,7 +558,7 @@ const PaymentPage = () => {
                           item.foodImage
                             ? (item.foodImage.startsWith('http')
                                 ? item.foodImage
-                                : `http://localhost:3000/uploads/${item.foodImage}`)
+                                : `${API_UPLOAD_URL}/${item.foodImage}`)
                             : '/default-user-icon.png'
                         }
                         alt={item.name}

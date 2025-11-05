@@ -5,6 +5,7 @@ import { FiArrowLeft, FiUser, FiPhone, FiMail, FiPackage } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import Footer from './Footer';
+import { API_BASE_URL } from '../config/api';
 
 const BookingDetails = ({ isLoggedIn, email }) => {
   const location = useLocation();
@@ -66,7 +67,7 @@ const BookingDetails = ({ isLoggedIn, email }) => {
   const handleMarkAsDone = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/payments/${booking.id}`, {
+      const res = await fetch(`${API_BASE_URL}/payments/${booking.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Done' }),

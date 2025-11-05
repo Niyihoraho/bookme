@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import logo from '../assets/LOGO-SERVICE.png';
 import Footer from './Footer';
+import { API_BASE_URL, API_UPLOAD_URL } from '../config/api';
 
 const getPriceWithFee = (price) => {
   let p = typeof price === 'string' ? parseFloat(price.replace(/,/g, '')) : price;
@@ -36,8 +37,8 @@ const BookServicePage = () => {
       // Fetch food delivery items for this provider
       const fetchFood = async () => {
         const [usersRes, foodRes] = await Promise.all([
-          fetch('http://localhost:3000/api/v1/user', { credentials: 'include' }),
-          fetch('http://localhost:3000/api/v1/food-delivery', { credentials: 'include' }),
+          fetch('${API_BASE_URL}/user', { credentials: 'include' }),
+          fetch('${API_BASE_URL}/food-delivery', { credentials: 'include' }),
         ]);
         const users = await usersRes.json();
         const allFoods = await foodRes.json();
@@ -56,8 +57,8 @@ const BookServicePage = () => {
       // Fetch provider and their services
       const fetchData = async () => {
         const [usersRes, servicesRes] = await Promise.all([
-          fetch('http://localhost:3000/api/v1/user', { credentials: 'include' }),
-          fetch('http://localhost:3000/api/v1/servises', { credentials: 'include' }),
+          fetch('${API_BASE_URL}/user', { credentials: 'include' }),
+          fetch('${API_BASE_URL}/servises', { credentials: 'include' }),
         ]);
         const users = await usersRes.json();
         const allServices = await servicesRes.json();
@@ -172,7 +173,7 @@ const BookServicePage = () => {
                                 food.foodImage
                                   ? (food.foodImage.startsWith('http')
                                     ? food.foodImage
-                                    : `http://localhost:3000/uploads/${food.foodImage}`)
+                                    : `${API_UPLOAD_URL}/${food.foodImage}`)
                                   : undefined
                               }
                               alt={food.name}

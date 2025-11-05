@@ -21,6 +21,7 @@ import Swal from 'sweetalert2';
 import Footer from './components/Footer';
 import ForgotPassword from './components/ForgotPassword';
 import FoodDeliveryBookingsPage from './components/FoodDeliveryBookingsPage';
+import { API_BASE_URL } from './config/api';
 
 const Home = ({
   isAdmin,
@@ -53,14 +54,21 @@ const Home = ({
       setLoading(true);
       try {
         const [servicesRes, usersRes, foodRes] = await Promise.all([
-          fetch('http://localhost:3000/api/v1/servises', { credentials: 'include' }),
-          fetch('http://localhost:3000/api/v1/user', { credentials: 'include' }),
-          fetch('http://localhost:3000/api/v1/food-delivery', { credentials: 'include' }),
+          fetch(`${API_BASE_URL}/servises`, { credentials: 'include' }),
+          fetch(`${API_BASE_URL}/user`, { credentials: 'include' }),
+          fetch(`${API_BASE_URL}/food-delivery`, { credentials: 'include' }),
         ]);
-        setServices(await servicesRes.json());
-        setUsers(await usersRes.json());
-        setFoodDeliveries(await foodRes.json());
-      } catch {
+        
+        const servicesData = await servicesRes.json();
+        const usersData = await usersRes.json();
+        const foodData = await foodRes.json();
+        
+        // Ensure we always set arrays
+        setServices(Array.isArray(servicesData) ? servicesData : []);
+        setUsers(Array.isArray(usersData) ? usersData : []);
+        setFoodDeliveries(Array.isArray(foodData) ? foodData : []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
         setServices([]);
         setUsers([]);
         setFoodDeliveries([]);
@@ -74,7 +82,7 @@ const Home = ({
   useEffect(() => {
     const fetchAvailabilities = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/v1/availability', { credentials: 'include' });
+        const res = await fetch(`${API_BASE_URL}/availability`, { credentials: 'include' });
         const all = await res.json();
         // Map: userId -> first normal (not unavailable, not emergency) availability
         const map = {};
@@ -95,17 +103,19 @@ const Home = ({
 
   // User map for quick access
   const userMap = {};
-  users.forEach(user => {
-    userMap[user.id] = user;
-  });
+  if (Array.isArray(users)) {
+    users.forEach(user => {
+      userMap[user.id] = user;
+    });
+  }
 
   // Filter services to only show those for approved users
-  const approvedUserIds = users.filter(u => u.approved).map(u => u.id);
+  const approvedUserIds = Array.isArray(users) ? users.filter(u => u.approved).map(u => u.id) : [];
 
   // Service filtering (unchanged for Massage)
   let filtered = category === 'All'
-    ? services.filter(s => approvedUserIds.includes(s.userId))
-    : services.filter(s => s.category === category && approvedUserIds.includes(s.userId));
+    ? (Array.isArray(services) ? services.filter(s => approvedUserIds.includes(s.userId)) : [])
+    : (Array.isArray(services) ? services.filter(s => s.category === category && approvedUserIds.includes(s.userId)) : []);
 
   // Only show one service per user
   const seenUserIds = new Set();
@@ -134,13 +144,13 @@ const Home = ({
   let filteredFoods = [];
   if (category === 'Food Delivery') {
     const seenFoodUserIds = new Set();
-    filteredFoods = foodDeliveries
+    filteredFoods = Array.isArray(foodDeliveries) ? foodDeliveries
       .filter(fd => approvedUserIds.includes(fd.userId))
       .filter(fd => {
         if (seenFoodUserIds.has(fd.userId)) return false;
         seenFoodUserIds.add(fd.userId);
         return true;
-      });
+      }) : [];
 
     // Apply search filter to food deliveries
     if (searchQuery.trim()) {
@@ -172,7 +182,7 @@ const Home = ({
           description: s.description,
           category: s.category,
         })),
-      ...foodDeliveries
+      ...(Array.isArray(foodDeliveries) ? foodDeliveries
         .filter(fd => approvedUserIds.includes(fd.userId))
         .map(fd => ({
           ...fd,
@@ -180,7 +190,7 @@ const Home = ({
           images: fd.foodImage,
           description: fd.foodDescription,
           category: 'Food delivery',
-        })),
+        })) : []),
     ];
 
     // Sort by createdAt or id if available (adjust field as needed)
@@ -418,7 +428,7 @@ const App = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' });
+        const res = await fetch(`${API_BASE_URL}/login/me`, { credentials: 'include' });
         const data = await res.json();
         
         if (data.userId) {
@@ -466,7 +476,7 @@ const App = () => {
   };
 
   const handleLogout = async () => {
-    await fetch('http://localhost:3000/api/v1/login/logout', {
+    await fetch(`${API_BASE_URL}/login/logout`, {
       method: 'POST',
       credentials: 'include',
     });
@@ -574,7 +584,7 @@ const App = () => {
         extra.innerHTML = `
           <button type="button" id="swal-forgot-password" class="text-[#32CD32] underline mb-2" style="background:none;border:none;cursor:pointer;">Forgot password?</button>
           <span>
-            New to service.com? 
+            New to Book me?
             <button type="button" id="swal-join-now" class="text-[#32CD32] underline" style="background:none;border:none;cursor:pointer;">Join Now</button>
           </span>
         `;
@@ -629,7 +639,7 @@ const App = () => {
       if (loginMode) {
         // Login
         try {
-          const res = await fetch('http://localhost:3000/api/v1/login', {
+          const res = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(result.value),
@@ -668,7 +678,7 @@ if (data.user && (data.user.role === 'admin' || data.user.isAdmin)) {
         } else {
           // Register
           try {
-            const res = await fetch('http://localhost:3000/api/v1/user', {
+            const res = await fetch(`${API_BASE_URL}/user`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(result.value),

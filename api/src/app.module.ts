@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { LoginModule } from './login/login.module';
 import { ServisesModule } from './servises/servises.module';
@@ -13,6 +14,10 @@ import { FoodDeliveryModule } from './food-delivery/food-delivery.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     UserModule,
     LoginModule,
     ServisesModule,

@@ -4,6 +4,7 @@ import Footer from './Footer';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { FaUtensils, FaMoneyBill, FaImage, FaFileAlt } from 'react-icons/fa';
+import { API_BASE_URL } from '../config/api';
 
 const CATEGORIES = [
   'Breakfast',
@@ -29,7 +30,7 @@ const FoodDeliveryAdd = ({ email }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' })
+    fetch('${API_BASE_URL}/login/me', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         setUserEmail(data?.email || '');
@@ -58,7 +59,7 @@ const FoodDeliveryAdd = ({ email }) => {
       const formData = new FormData();
       formData.append('file', imageFile);
       try {
-        const res = await fetch('http://localhost:3000/api/v1/upload', {
+        const res = await fetch('${API_BASE_URL}/upload', {
           method: 'POST',
           body: formData,
         });
@@ -73,7 +74,7 @@ const FoodDeliveryAdd = ({ email }) => {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/api/v1/food-delivery', {
+      const res = await fetch('${API_BASE_URL}/food-delivery', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

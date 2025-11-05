@@ -23,7 +23,7 @@ export class FoodDeliveryService {
 
   async findAll() {
     return this.prisma.foodDelivery.findMany({
-      include: { user: true },
+      include: { User: true },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -31,7 +31,7 @@ export class FoodDeliveryService {
   async findOne(id: number) {
     const food = await this.prisma.foodDelivery.findUnique({
       where: { id },
-      include: { user: true },
+      include: { User: true },
     });
     if (!food) throw new NotFoundException(`FoodDelivery #${id} not found`);
     return food;

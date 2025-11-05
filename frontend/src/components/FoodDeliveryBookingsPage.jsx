@@ -4,6 +4,7 @@ import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
 import { FiUser, FiCalendar, FiEye, FiPackage } from 'react-icons/fi';
 import { MdDone, MdPending } from 'react-icons/md';
+import { API_BASE_URL, API_UPLOAD_URL } from '../config/api';
 
 const statusColor = {
   Done: 'bg-[#32CD32] text-white px-2 py-1 rounded flex items-center gap-1',
@@ -46,7 +47,7 @@ const FoodDeliveryBookingsPage = ({ isLoggedIn, email }) => {
     // Fetch user info to get userId
     const fetchUser = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' });
+        const res = await fetch('${API_BASE_URL}/login/me', { credentials: 'include' });
         const me = await res.json();
         setUserId(me.userId || '');
       } catch {
@@ -59,7 +60,7 @@ const FoodDeliveryBookingsPage = ({ isLoggedIn, email }) => {
   useEffect(() => {
     if (!userId) return;
     setLoading(true);
-    fetch(`http://localhost:3000/api/v1/payments/food-delivery/user/${userId}`, { credentials: 'include' })
+    fetch(`${API_BASE_URL}/payments/food-delivery/user/${userId}`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         setBookings(Array.isArray(data) ? data : []);
@@ -149,7 +150,7 @@ const FoodDeliveryBookingsPage = ({ isLoggedIn, email }) => {
                                 src={
                                   food.foodImage.startsWith('http')
                                     ? food.foodImage
-                                    : `http://localhost:3000/uploads/${food.foodImage}`
+                                    : `${API_UPLOAD_URL}/${food.foodImage}`
                                 }
                                 alt={food.name}
                                 className="w-10 h-10 object-cover rounded"

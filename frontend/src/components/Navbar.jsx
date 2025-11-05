@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import defaultLogo from '../assets/LOGO-SERVICE.png';
 import menuLogo from '../assets/Book me, bg_white.png';
+import { API_BASE_URL } from '../config/api';
 
 const Navbar = ({ onLoginClick, onJoinClick, isLoggedIn, phone, onLogout, userProfile }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -138,7 +139,7 @@ const handleBookings = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         setMenuOpen(false);
-        await fetch('http://localhost:3000/api/v1/login/logout', {
+        await fetch(`${API_BASE_URL}/login/logout`, {
           method: 'POST',
           credentials: 'include',
         });

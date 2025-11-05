@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL, API_UPLOAD_URL } from '../config/api';
 
 const StarRating = ({ rating = 2 }) => {
   const totalStars = 5;
@@ -107,7 +108,7 @@ const ServiceCard = ({
               ? service.images[0]
               : (service.images.startsWith('http')
                   ? service.images
-                  : `http://localhost:3000/uploads/${service.images}`)
+                  : `${API_UPLOAD_URL}/${service.images}`)
           }
           alt={service.name || 'Image'}
           className="w-full h-24 sm:h-24 md:h-32 lg:h-36 object-cover rounded mb-1 bg-[#232323]"

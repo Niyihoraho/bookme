@@ -3,6 +3,7 @@ import Navbar from './Navbar';
 import Swal from 'sweetalert2';
 import { FiMoreVertical } from 'react-icons/fi';
 import Footer from './Footer';
+import { API_BASE_URL } from '../config/api';
 
 // Accept isLoggedIn and email as props from App.jsx
 const MyServices = ({ isLoggedIn, email }) => {
@@ -25,7 +26,7 @@ const MyServices = ({ isLoggedIn, email }) => {
   useEffect(() => {
     // Only fetch if not already set and logged in
     if (!userId && isLoggedIn) {
-      fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' })
+      fetch('${API_BASE_URL}/login/me', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.userId) setUserId(data.userId);
@@ -38,7 +39,7 @@ const MyServices = ({ isLoggedIn, email }) => {
     const fetchServices = async () => {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:3000/api/v1/servises', { credentials: 'include' });
+        const res = await fetch('${API_BASE_URL}/servises', { credentials: 'include' });
         const data = await res.json();
         const filtered = Array.isArray(data)
           ? data.filter(s => String(s.userId) === String(userId) || String(s.userEmail) === String(email))
@@ -65,7 +66,7 @@ const MyServices = ({ isLoggedIn, email }) => {
     });
     if (confirm.isConfirmed) {
       try {
-        const res = await fetch(`http://localhost:3000/api/v1/servises/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/servises/${id}`, {
           method: 'DELETE',
           credentials: 'include',
         });
@@ -125,7 +126,7 @@ const MyServices = ({ isLoggedIn, email }) => {
       const data = new FormData();
       data.append('file', editForm.images);
       try {
-        const res = await fetch('http://localhost:3000/api/v1/upload', {
+        const res = await fetch('${API_BASE_URL}/upload', {
           method: 'POST',
           body: data,
         });
@@ -145,7 +146,7 @@ const MyServices = ({ isLoggedIn, email }) => {
         location: editForm.location,
         price: Number(editForm.price),
       };
-      const res = await fetch(`http://localhost:3000/api/v1/servises/${editService.id}`, {
+      const res = await fetch(`${API_BASE_URL}/servises/${editService.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateFields),

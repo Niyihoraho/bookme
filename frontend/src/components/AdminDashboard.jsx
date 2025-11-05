@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Footer from './Footer';
 import classNames from 'classnames'; // Optional: for cleaner class logic (install with npm if you want)
 import jsPDF from 'jspdf'; // npm install jspdf
+import { API_BASE_URL, API_UPLOAD_URL } from '../config/api';
 
 const PAGE_SIZE = 5;
 const DEFAULT_IMAGE = '/default-user-icon.png';
@@ -58,7 +59,7 @@ const AdminDashboard = ({ onLogout }) => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' });
+        const res = await fetch('${API_BASE_URL}/login/me', { credentials: 'include' });
         const data = await res.json();
         if (!data.userId || !(data.role === 'admin' || data.isAdmin)) {
           Swal.fire({
@@ -93,11 +94,11 @@ const AdminDashboard = ({ onLogout }) => {
       setLoading(true);
       try {
         const [usersRes, servicesRes, bookingsRes, paymentsRes, foodRes] = await Promise.all([
-          fetch('http://localhost:3000/api/v1/user', { credentials: 'include' }),
-          fetch('http://localhost:3000/api/v1/servises', { credentials: 'include' }),
-          fetch('http://localhost:3000/api/v1/payments', { credentials: 'include' }),
-          fetch('http://localhost:3000/api/v1/payments', { credentials: 'include' }),
-          fetch('http://localhost:3000/api/v1/food-delivery', { credentials: 'include' }), // <-- ADD THIS LINE
+          fetch('${API_BASE_URL}/user', { credentials: 'include' }),
+          fetch('${API_BASE_URL}/servises', { credentials: 'include' }),
+          fetch('${API_BASE_URL}/payments', { credentials: 'include' }),
+          fetch('${API_BASE_URL}/payments', { credentials: 'include' }),
+          fetch('${API_BASE_URL}/food-delivery', { credentials: 'include' }), // <-- ADD THIS LINE
         ]);
         const usersData = await usersRes.json();
         const servicesData = await servicesRes.json();
@@ -123,7 +124,7 @@ const AdminDashboard = ({ onLogout }) => {
 
   // Fetch feedbacks on mount or when tab is feedback
   useEffect(() => {
-    fetch('http://localhost:3000/api/v1/feedback', { credentials: 'include' })
+    fetch('${API_BASE_URL}/feedback', { credentials: 'include' })
       .then(res => res.json())
       .then(data => setFeedbacks(Array.isArray(data) ? data : []))
       .catch(() => setFeedbacks([]));
@@ -141,7 +142,7 @@ const AdminDashboard = ({ onLogout }) => {
   // Approve user (with improved error handling)
   const handleApproveUser = async (userId) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/user/${userId}/approve`, {
+      const res = await fetch(`${API_BASE_URL}/user/${userId}/approve`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -167,7 +168,7 @@ const AdminDashboard = ({ onLogout }) => {
   // Reject user (with improved error handling)
   const handleRejectUser = async (userId) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/user/${userId}/reject`, {
+      const res = await fetch(`${API_BASE_URL}/user/${userId}/reject`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -265,7 +266,7 @@ const AdminDashboard = ({ onLogout }) => {
                     if (f.foodImage && typeof f.foodImage === 'string') {
                       img = f.foodImage.startsWith('http')
                         ? f.foodImage
-                        : `http://localhost:3000/uploads/${f.foodImage}`;
+                        : `${API_UPLOAD_URL}/${f.foodImage}`;
                     }
                     return `
                       <tr>
@@ -409,7 +410,7 @@ const AdminDashboard = ({ onLogout }) => {
             payload.password = adminProfile.password;
           }
           // Use the admin's actual ID endpoint
-          const res = await fetch(`http://localhost:3000/api/v1/user/${adminId}`, {
+          const res = await fetch(`${API_BASE_URL}/user/${adminId}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -618,7 +619,7 @@ const AdminDashboard = ({ onLogout }) => {
                   <td className="p-1 md:p-2">
                     {fd.foodImage ? (
                       <img
-                        src={fd.foodImage.startsWith('http') ? fd.foodImage : `http://localhost:3000/uploads/${fd.foodImage}`}
+                        src={fd.foodImage.startsWith('http') ? fd.foodImage : `${API_UPLOAD_URL}/${fd.foodImage}`}
                         alt={fd.name}
                         style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6 }}
                         onError={e => { e.target.src = DEFAULT_IMAGE; }}

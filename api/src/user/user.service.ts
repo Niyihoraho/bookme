@@ -70,6 +70,7 @@ export class UserService {
         // Set role and approved, fallback to defaults if not provided
         role: role ?? 'user',
         approved: approved ?? false,
+        updatedAt: new Date(),
       },
     });
 

@@ -6,11 +6,19 @@ import { join } from 'path';
 import * as session from 'express-session';
 import * as express from 'express';
 import * as fs from 'fs';
+import * as dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: {
-      origin: 'http://localhost:3001', // React app URL/port
+      origin: [
+        process.env.CORS_ORIGIN || 'http://localhost:3001', // React app URL/port
+        'http://16.170.244.196:3001', // Production frontend
+        'http://localhost:3001', // Local development
+      ],
       credentials: true,
     },
   });
@@ -44,6 +52,8 @@ async function bootstrap() {
   app.use('/uploads', express.static(uploadsDir));
   app.useStaticAssets(uploadsDir, { prefix: '/uploads/' });
 
-  await app.listen(3000);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`🚀 Application is running on: http://localhost:${port}`);
 }
 bootstrap();

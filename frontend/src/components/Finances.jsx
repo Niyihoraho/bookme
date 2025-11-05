@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import { FaCalendarDay, FaCalendarWeek, FaCalendarAlt, FaCalendar } from 'react-icons/fa';
 import Footer from './Footer';
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '../config/api';
 
 const TooltipPortal = ({ children, position, visible }) => {
   if (!visible) return null;
@@ -51,7 +52,7 @@ const Finances = ({ isLoggedIn, email }) => {
       try {
         let sessionUserId = userId;
         if (!sessionUserId) {
-          const meRes = await fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' });
+          const meRes = await fetch('${API_BASE_URL}/login/me', { credentials: 'include' });
           const me = await meRes.json();
           sessionUserId = me.userId || '';
           setUserId(sessionUserId);
@@ -62,7 +63,7 @@ const Finances = ({ isLoggedIn, email }) => {
           return;
         }
         // Fetch payments for this user, including join tables
-        const res = await fetch(`http://localhost:3000/api/v1/payments/user/${sessionUserId}`, { credentials: 'include' });
+        const res = await fetch(`${API_BASE_URL}/payments/user/${sessionUserId}`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           setPayments(Array.isArray(data) ? data : []);

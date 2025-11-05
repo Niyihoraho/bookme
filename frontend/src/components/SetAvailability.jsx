@@ -3,6 +3,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import { FaCalendarAlt, FaClock, FaTimesCircle, FaExclamationTriangle, FaEnvelope } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '../config/api';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -30,7 +31,7 @@ const SetAvailability = ({ isLoggedIn, email }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' });
+        const res = await fetch('${API_BASE_URL}/login/me', { credentials: 'include' });
         const data = await res.json();
         if (data.userId) {
           setUserId(data.userId);
@@ -54,7 +55,7 @@ const SetAvailability = ({ isLoggedIn, email }) => {
   // Load current availability and unavailable times for the real user
   useEffect(() => {
     if (!userId) return;
-    fetch(`http://localhost:3000/api/v1/availability/${userId}`)
+    fetch(`${API_BASE_URL}/availability/${userId}`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -94,7 +95,7 @@ const SetAvailability = ({ isLoggedIn, email }) => {
       emergency: false,
     };
     try {
-      const res = await fetch('http://localhost:3000/api/v1/availability', {
+      const res = await fetch('${API_BASE_URL}/availability', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -148,7 +149,7 @@ const SetAvailability = ({ isLoggedIn, email }) => {
         emergency: true,
         duration, // <-- send correct duration
       };
-      const res = await fetch('http://localhost:3000/api/v1/availability', {
+      const res = await fetch('${API_BASE_URL}/availability', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

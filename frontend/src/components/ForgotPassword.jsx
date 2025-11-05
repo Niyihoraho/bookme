@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import logo from '../assets/LOGO-SERVICE.png';
 import Footer from './Footer';
+import { API_BASE_URL } from '../config/api';
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1); // 1: email, 2: otp+new password, 3: done
@@ -19,7 +20,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setMsg('');
     try {
-      const res = await fetch('http://localhost:3000/api/v1/password-reset/request', {
+      const res = await fetch('${API_BASE_URL}/password-reset/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -43,7 +44,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setMsg('');
     try {
-      const res = await fetch('http://localhost:3000/api/v1/password-reset/verify', {
+      const res = await fetch('${API_BASE_URL}/password-reset/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp, newPassword }),

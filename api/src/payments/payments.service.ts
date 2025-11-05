@@ -166,7 +166,7 @@ export class PaymentsService {
         },
         isAvailable: true,
       },
-      include: { services: true }, // <-- Add this line
+      include: { Service: true }, // <-- Add this line
     });
 
     const newStart = bookingDate.getTime();
@@ -175,7 +175,7 @@ export class PaymentsService {
     const conflict = existingBookings.find((b) => {
       const bookedStart = new Date(b.datetime).getTime();
       // Get duration from service if available, else fallback to 60
-      const bookedServiceIds = b.services?.map((s) => s.id) || [];
+      const bookedServiceIds = b.Service?.map((s) => s.id) || [];
       let bookedDuration = 60;
       if (bookedServiceIds.length) {
         const bookedService = services.find((s) =>
@@ -329,9 +329,9 @@ export class PaymentsService {
     return this.prisma.payment.findUnique({
       where: { id: payment.id },
       include: {
-        paymentServices: { include: { service: true } },
-        paymentFoodDeliveries: { include: { foodDelivery: true } },
-        user: true,
+        PaymentService: { include: { Service: true } },
+        PaymentFoodDelivery: { include: { FoodDelivery: true } },
+        User: true,
       },
     });
   }
@@ -339,9 +339,9 @@ export class PaymentsService {
   async findAll() {
     return this.prisma.payment.findMany({
       include: {
-        paymentServices: { include: { service: true } },
-        paymentFoodDeliveries: { include: { foodDelivery: true } },
-        user: true,
+        PaymentService: { include: { Service: true } },
+        PaymentFoodDelivery: { include: { FoodDelivery: true } },
+        User: true,
       },
     });
   }
@@ -350,9 +350,9 @@ export class PaymentsService {
     return this.prisma.payment.findUnique({
       where: { id },
       include: {
-        paymentServices: { include: { service: true } },
-        paymentFoodDeliveries: { include: { foodDelivery: true } },
-        user: true,
+        PaymentService: { include: { Service: true } },
+        PaymentFoodDelivery: { include: { FoodDelivery: true } },
+        User: true,
       },
     });
   }
@@ -364,9 +364,9 @@ export class PaymentsService {
       where: { id },
       data: rest,
       include: {
-        paymentServices: { include: { service: true } },
-        paymentFoodDeliveries: { include: { foodDelivery: true } },
-        user: true,
+        PaymentService: { include: { Service: true } },
+        PaymentFoodDelivery: { include: { FoodDelivery: true } },
+        User: true,
       },
     });
 
@@ -391,9 +391,9 @@ export class PaymentsService {
     return this.prisma.payment.findUnique({
       where: { id },
       include: {
-        paymentServices: { include: { service: true } },
-        paymentFoodDeliveries: { include: { foodDelivery: true } },
-        user: true,
+        PaymentService: { include: { Service: true } },
+        PaymentFoodDelivery: { include: { FoodDelivery: true } },
+        User: true,
       },
     });
   }
@@ -410,9 +410,9 @@ export class PaymentsService {
         userId,
       },
       include: {
-        paymentServices: { include: { service: true } },
-        paymentFoodDeliveries: { include: { foodDelivery: true } },
-        user: true,
+        PaymentService: { include: { Service: true } },
+        PaymentFoodDelivery: { include: { FoodDelivery: true } },
+        User: true,
       },
       orderBy: { datetime: 'desc' },
     });
@@ -421,11 +421,11 @@ export class PaymentsService {
   async findByProvider(providerId: number) {
     return this.prisma.payment.findMany({
       where: {
-        services: {
+        Service: {
           some: { userId: providerId },
         },
       },
-      include: { services: true, user: true },
+      include: { Service: true, User: true },
     });
   }
 
@@ -434,13 +434,13 @@ export class PaymentsService {
     return this.prisma.payment.findMany({
       where: {
         userId: userId,
-        paymentFoodDeliveries: {
+        PaymentFoodDelivery: {
           some: {}, // at least one food delivery item
         },
       },
       include: {
-        paymentFoodDeliveries: { include: { foodDelivery: true } },
-        user: true,
+        PaymentFoodDelivery: { include: { FoodDelivery: true } },
+        User: true,
       },
       orderBy: { datetime: 'desc' },
     });
@@ -480,9 +480,9 @@ export class PaymentsService {
     const existingPayment = await this.prisma.payment.findUnique({
       where: { id: Number(client_token) },
       include: {
-        paymentServices: { include: { service: true } },
-        paymentFoodDeliveries: { include: { foodDelivery: true } },
-        user: true,
+        PaymentService: { include: { Service: true } },
+        PaymentFoodDelivery: { include: { FoodDelivery: true } },
+        User: true,
       },
     });
 
@@ -524,9 +524,9 @@ export class PaymentsService {
         ...(gateway_response && { gatewayResponse: JSON.stringify(gateway_response) }),
       },
       include: {
-        paymentServices: { include: { service: true } },
-        paymentFoodDeliveries: { include: { foodDelivery: true } },
-        user: true,
+        PaymentService: { include: { Service: true } },
+        PaymentFoodDelivery: { include: { FoodDelivery: true } },
+        User: true,
       },
     });
 
@@ -534,7 +534,7 @@ export class PaymentsService {
     
     // Log successful payment for monitoring
     if (paymentStatus === 'paid') {
-      console.log(`Payment ${client_token} completed successfully for user ${existingPayment.user.email}`);
+      console.log(`Payment ${client_token} completed successfully for user ${existingPayment.email}`);
     }
 
     return updatedPayment;

@@ -4,6 +4,7 @@ import { FiUser, FiCalendar, FiEye, FiPackage } from 'react-icons/fi';
 import { MdDone, MdPending } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
+import { API_BASE_URL } from '../config/api';
 
 const statusColor = {
   Done: 'bg-[#32CD32] text-white px-2 py-1 rounded flex items-center gap-1',
@@ -40,7 +41,7 @@ const BookingsPage = ({ isLoggedIn, email }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const meRes = await fetch('http://localhost:3000/api/v1/login/me', { credentials: 'include' });
+        const meRes = await fetch('${API_BASE_URL}/login/me', { credentials: 'include' });
         const me = await meRes.json();
         setUserEmail(me.email || email || '');
         setUserId(me.userId || '');
@@ -70,13 +71,13 @@ const BookingsPage = ({ isLoggedIn, email }) => {
 
         // Fetch bookings for the user (try both userId and email for compatibility)
         let bookingsData = [];
-        let res = await fetch(`http://localhost:3000/api/v1/payments/user/${userId}`, { credentials: 'include' });
+        let res = await fetch(`${API_BASE_URL}/payments/user/${userId}`, { credentials: 'include' });
         if (res.ok) {
           bookingsData = await res.json();
         }
         // If no bookings found, try by email (legacy support)
         if ((!Array.isArray(bookingsData) || bookingsData.length === 0) && userEmail) {
-          res = await fetch(`http://localhost:3000/api/v1/payments/user-email/${encodeURIComponent(userEmail)}`, { credentials: 'include' });
+          res = await fetch(`${API_BASE_URL}/payments/user-email/${encodeURIComponent(userEmail)}`, { credentials: 'include' });
           if (res.ok) {
             bookingsData = await res.json();
           }
@@ -94,7 +95,7 @@ const BookingsPage = ({ isLoggedIn, email }) => {
 
         // Fetch services for this user (to check if provider)
         let servicesData = [];
-        const servicesRes = await fetch(`http://localhost:3000/api/v1/service/user/${userId}`, { credentials: 'include' });
+        const servicesRes = await fetch(`${API_BASE_URL}/service/user/${userId}`, { credentials: 'include' });
         if (servicesRes.ok) {
           servicesData = await servicesRes.json();
         }

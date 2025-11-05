@@ -4,6 +4,7 @@ import { FiArrowLeft } from "react-icons/fi";
 import Swal from "sweetalert2";
 import logo from "../assets/LOGO-SERVICE.png";
 import Footer from "./Footer";
+import { API_BASE_URL } from '../config/api';
 
 const Feedback = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const Feedback = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:3000/api/v1/feedback", {
+      const res = await fetch("${API_BASE_URL}/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

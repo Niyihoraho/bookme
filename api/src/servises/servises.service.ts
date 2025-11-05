@@ -19,9 +19,10 @@ export class ServisesService {
         locationType: createServiceDto.locationType,
         description: createServiceDto.description,
         duration: createServiceDto.duration, // <-- handle duration
-        user: {
+        User: {
           connect: { email: createServiceDto.userEmail },
         },
+        updatedAt: new Date(),
       },
     });
     // Map images field to full URL
@@ -37,10 +38,10 @@ export class ServisesService {
   async findAll() {
     const services = await this.prisma.service.findMany({
       include: {
-        user: true,
+        User: true,
       },
       where: {
-        user: {
+        User: {
           approved: true,
         },
       },
@@ -59,7 +60,7 @@ export class ServisesService {
     const service = await this.prisma.service.findUnique({
       where: { id },
       include: {
-        user: true,
+        User: true,
       },
     });
 
