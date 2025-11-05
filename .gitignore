@@ -28,3 +28,11 @@ PRODUCTION_BUILD_PROCEDURE.md
 # License files
 .LICENSE*
 markdown/
+
+# SSH Keys and certificates
+*.pem
+*.key
+
+# Server configuration (contains sensitive data)
+ecosystem.config.js
+frontend-server.js
