@@ -1,24 +1,30 @@
-node_modules/\ndist/\n.env\n*.log
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Deployment scripts
 .deploy-and-setup.ps1
 .deploy-update.ps1
 .deploy.ps1
+deploy-and-setup.ps1
+deploy-update.ps1
+deploy-smart.ps1
+deploy.ps1
+dev-start.ps1
+
+# Documentation
 .PRODUCTION_BUILD_PROCEDURE.md
 .README.md
-.LICENSE
-.LICENSE.md
-.LICENSE.txt
-.LICENSE.txt.md
-.LICENSE.txt.txt
-.LICENSE.txt.txt.md
-.LICENSE.txt.txt.txt
-.LICENSE.txt.txt.txt.md
-.LICENSE.txt.txt.txt.txt
-.LICENSE.txt.txt.txt.txt.md
-.LICENSE.txt.txt.txt.txt.txt
-.LICENSE.txt.txt.txt.txt.txt.md
-.LICENSE.txt.txt.txt.txt.txt.txt
-.LICENSE.txt.txt.txt.txt.txt.txt.md
-.LICENSE.txt.txt.txt.txt.txt.txt.txt
-.LICENSE.txt.txt.txt.txt.txt.txt.txt.md
-.LICENSE.txt.txt.txt.txt.txt.txt.txt.txt
+PRODUCTION_BUILD_PROCEDURE.md
+
+# License files
+.LICENSE*
 markdown/
