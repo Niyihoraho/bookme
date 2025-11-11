@@ -95,7 +95,20 @@ const ServiceCard = ({
           loading="lazy"
         />
         <div className="min-w-0 flex-1">
-          <div className="font-bold text-[0.95em] sm:text-[1em] md:text-[1.1em] text-white leading-tight truncate max-w-[90px] sm:max-w-[90px] md:max-w-[120px]">{user.businessName || 'Unknown'}</div>
+          <div
+            className="font-bold text-white leading-tight business-name-responsive"
+            style={{
+              fontSize: 'clamp(0.95em, 2.7vw, 1.02em)',
+              lineHeight: 1.13,
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+              marginBottom: '0.08em',
+              maxWidth: '130px',
+              minHeight: '1.5em'
+            }}
+          >
+            {user.businessName || 'Unknown'}
+          </div>
           <div className="text-gray-400 text-[0.8em] sm:text-[0.8em] md:text-xs truncate max-w-[90px] sm:max-w-[90px] md:max-w-[120px]">{user.username}</div>
         </div>
         <StarRating rating={rating} />
@@ -108,7 +121,7 @@ const ServiceCard = ({
               ? service.images[0]
               : (service.images.startsWith('http')
                   ? service.images
-                  : `${API_UPLOAD_URL}/${service.images}`)
+                  : `http://${API_UPLOAD_URL}/${service.images}`)
           }
           alt={service.name || 'Image'}
           className="w-full h-24 sm:h-24 md:h-32 lg:h-36 object-cover rounded mb-1 bg-[#232323]"
@@ -117,15 +130,32 @@ const ServiceCard = ({
       )}
       {/* Title and Description */}
       <div className="bg-[#232323] rounded-b-lg py-1 px-1 mt-1 min-h-[28px] sm:min-h-[32px] md:min-h-[40px]">
-        <div className="font-bold text-[0.95em] sm:text-[1em] md:text-[1.1em] text-white truncate">
+        <div
+          className="font-bold text-white service-title-responsive"
+          style={{
+            fontSize: 'clamp(0.96em, 2vw, 1.10em)',
+            lineHeight: 1.13,
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+            marginBottom: '0.07em',
+            minHeight: '1.4em'
+          }}
+        >
           {service.category}, {user.businessName}
         </div>
-        <div className="text-gray-300 text-[0.8em] sm:text-[0.8em] md:text-xs mt-1 truncate" style={{
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          maxWidth: '100%',
-        }}>
+        <div
+          className="text-gray-300 service-description-responsive"
+          style={{
+            fontSize: 'clamp(0.65em, 0.82vw, 0.8em)',
+            lineHeight: 1.22,
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+            marginBottom: '0.18em',
+            minHeight: '1em',
+            maxHeight: '2.2em',
+            overflow: 'hidden'
+          }}
+        >
           {service.description}
         </div>
       </div>

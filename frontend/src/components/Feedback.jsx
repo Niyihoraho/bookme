@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import logo from "../assets/LOGO-SERVICE.png";
 import Footer from "./Footer";
 import { API_BASE_URL } from '../config/api';
-
 const Feedback = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -34,7 +33,7 @@ const Feedback = () => {
     };
 
     try {
-      const res = await fetch("${API_BASE_URL}/feedback", {
+      const res = await fetch("http://${API_BASE_URL}/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -89,7 +88,7 @@ const Feedback = () => {
       <main className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="bg-[#1A1A1A] w-full max-w-3xl mx-auto border border-[#32CD32] shadow-lg rounded-2xl p-6">
           <h2 className="text-[#32CD32] text-2xl font-bold text-center mb-6">
-            We’d love your feedback
+            What type of service are you looking for or want us to add?
           </h2>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
@@ -120,7 +119,7 @@ const Feedback = () => {
             />
             <textarea
               name="message"
-              placeholder="What do you want to say? Suggestions, improvements, issues…"
+              placeholder="Describe the service you'd like to see or suggest improvements..."
               className="bg-[#222] text-white rounded px-4 py-2 border border-[#222] focus:border-[#32CD32] outline-none min-h-[100px]"
               value={form.message}
               onChange={handleChange}

@@ -235,7 +235,7 @@ const PaymentPage = () => {
     addField('currency', 'RWF');
     addField('comment', `Order ${orderId}`);
     addField('client_token', orderId); // orderId must be your backend payment id
-    addField('return_url', 'http://localhost:3001/payment-status'); // Afripay will append ?client_token=...
+    addField('return_url', 'http://${API_BASE_URL}/payment-status'); // Afripay will append ?client_token=...
     addField('app_id', 'ca8462f2652470d762e0ee4aaac61051');
     addField('app_secret', 'JDJ5JDEwJFZhaVBS');
 

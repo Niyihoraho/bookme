@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiSearch, FiShoppingCart, FiMapPin } from 'react-icons/fi';
 import logo from '../assets/LOGO-SERVICE.png';
 import Footer from './Footer';
-import { API_BASE_URL, API_UPLOAD_URL } from '../config/api';
+
 
 const getPriceWithFee = (price) => {
   let p = typeof price === 'string' ? parseFloat(price.replace(/,/g, '')) : price;
@@ -22,6 +22,18 @@ const BookServicePage = () => {
   const [category, setCategory] = useState('service'); // 'service' or 'food'
   const [foodCategories, setFoodCategories] = useState([]);
   const [selectedFoodCategory, setSelectedFoodCategory] = useState('All'); // Default to 'All'
+  const [search, setSearch] = useState("");
+  // Filtered services/food
+  const filteredServices = category === "service"
+    ? services.filter(s =>
+        (!search || s.name?.toLowerCase().includes(search.toLowerCase()) || s.description?.toLowerCase().includes(search.toLowerCase()))
+      )
+    : [];
+  const filteredFood = category === "food"
+    ? foodItems.filter(f =>
+        (!search || f.name?.toLowerCase().includes(search.toLowerCase()) || f.ingredients?.toLowerCase().includes(search.toLowerCase()))
+      )
+    : [];
 
   useEffect(() => {
     // Detect if this is a food delivery provider (from location.state or param)
@@ -37,8 +49,8 @@ const BookServicePage = () => {
       // Fetch food delivery items for this provider
       const fetchFood = async () => {
         const [usersRes, foodRes] = await Promise.all([
-          fetch('${API_BASE_URL}/user', { credentials: 'include' }),
-          fetch('${API_BASE_URL}/food-delivery', { credentials: 'include' }),
+          fetch('http://${API_BASE_URL}/user', { credentials: 'include' }),
+          fetch('http://${API_BASE_URL}/food-delivery', { credentials: 'include' }),
         ]);
         const users = await usersRes.json();
         const allFoods = await foodRes.json();
@@ -57,8 +69,8 @@ const BookServicePage = () => {
       // Fetch provider and their services
       const fetchData = async () => {
         const [usersRes, servicesRes] = await Promise.all([
-          fetch('${API_BASE_URL}/user', { credentials: 'include' }),
-          fetch('${API_BASE_URL}/servises', { credentials: 'include' }),
+          fetch('http://${API_BASE_URL}/user', { credentials: 'include' }),
+          fetch('http://${API_BASE_URL}/servises', { credentials: 'include' }),
         ]);
         const users = await usersRes.json();
         const allServices = await servicesRes.json();
@@ -92,38 +104,53 @@ const BookServicePage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#121212] text-white">
-      {/* Header */}
-      <section className="bg-[#1A1A1A] sticky top-0 z-50 text-[#32CD32] px-2 py-3 shadow-md">
-        <div className="flex items-center justify-between mb-3 max-w-3xl mx-auto w-full">
-          <div className="flex items-center">
-            <img
-              src={logo}
-              alt="Service Logo"
-              className="w-24 h-24 object-contain cursor-pointer"
-              onClick={() => navigate('/')}
-            />
-          </div>
+      {/* Modern Header Bar (search, location, cart) */}
+      <header className="bg-[#121212] shadow sticky top-0 left-0 z-50">
+        <div className="flex items-center justify-between max-w-4xl mx-auto px-4 py-3">
+          {/* Back Icon */}
           <button
+            className="flex items-center justify-center mr-2 p-1 rounded bg-[#232323] hover:bg-[#2a2a2a] text-white text-[2rem]"
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-4 py-2 rounded bg-[#32CD32] text-black font-semibold hover:bg-white hover:text-[#32CD32] transition"
             aria-label="Back"
           >
-            <FiArrowLeft className="text-xl" />
-            <span className="text-base font-bold">Back</span>
+            <FiArrowLeft />
           </button>
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="Service Logo" className="w-24 h-24 object-contain mr-2 cursor-pointer" onClick={() => navigate('/')} />
+          </div>
+          {/* Search bar */}
+          <div className="flex-1 max-w-xl mx-3 flex items-center">
+            <div className="relative w-full">
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search across entire store..."
+                className="w-full py-2 pl-10 pr-16 rounded-full border border-gray-700 bg-[#232323] text-white focus:outline-[#32CD32] shadow-sm placeholder-gray-400"
+                style={{ fontSize: 18 }}
+              />
+            </div>
+          </div>
+          {/* Location + Cart */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center bg-[#181818] px-4 py-1 rounded-2xl border border-gray-700 shadow-sm text-white font-semibold">
+              <FiMapPin className="text-[#32CD32] text-lg mr-1 -ml-1" />
+              <span>Huye city</span>
+            </div>
+            <div className="relative cursor-pointer" onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })} title="View selected items">
+              <FiShoppingCart className="text-3xl text-white hover:text-[#32CD32] transition" />
+              {selected.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-[#e53e3e] text-white text-xs rounded-full px-2 py-[2px] font-bold border-2 border-[#121212] shadow">
+                  {selected.length}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
-<div className="text-center py-2 px-4 bg-[#232323] rounded-md shadow-md mt-2 max-w-2xl mx-auto">
-  <p className="text-xl sm:text-2xl font-bold text-[#32CD32] flex items-center justify-center animate-pulse gap-2">
-    🚚 We deliver in <span className="underline underline-offset-2">20 minutes</span>!
-  </p>
-  {selected.length > 0 && (
-    <p className="mt-1 text-gray-400 text-sm">
-      You’ve selected <span className="text-white font-semibold">{selected.length}</span> item{selected.length > 1 ? 's' : ''}.
-    </p>
-  )}
-</div>
-
-      </section>
+      </header>
+      {/* Removed old header section with back button and previous design. */}
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-1 py-4 sm:px-2 sm:py-6">
@@ -160,8 +187,8 @@ const BookServicePage = () => {
                       {cat}
                     </div>
                     <div>
-                      {foodItems
-                        .filter(f => f.category === cat)
+                      {filteredFood
+                        .filter(food => food.category === cat)
                         .map(food => (
                           <div
                             key={food.id}
@@ -173,7 +200,7 @@ const BookServicePage = () => {
                                 food.foodImage
                                   ? (food.foodImage.startsWith('http')
                                     ? food.foodImage
-                                    : `${API_UPLOAD_URL}/${food.foodImage}`)
+                                    : `http://${API_UPLOAD_URL}/${food.foodImage}`)
                                   : undefined
                               }
                               alt={food.name}
@@ -224,7 +251,7 @@ const BookServicePage = () => {
             </>
           ) : (
             <div className="space-y-4 mb-8">
-              {services.map((s, idx) => (
+              {filteredServices.map((s, idx) => (
                 <div
                   key={idx}
                   className={`flex items-center border rounded-lg px-2 py-2 transition relative ${
@@ -277,9 +304,19 @@ const BookServicePage = () => {
           >
             {selected.length === 0 ? 'Select at least one item' : `Get your services`}
           </button>
-          <p className="text-center text-sm text-gray-400 mt-2">
-  Enjoy fast delivery, fresh meals & reliable services in just 20 minutes!
-</p>
+
+          {/* Modern Description box for delivery/services */}
+          <div className="bg-[#232323] rounded-md shadow-md my-5 py-4 px-6 text-center max-w-2xl mx-auto border-[1.5px] border-[#32CD32]">
+            <h3 className="text-xl font-bold text-[#32CD32] mb-2">Seamless Booking & Reliable Delivery</h3>
+            <p className="text-gray-200 text-base leading-relaxed mb-2">
+              Experience top-tier convenience with our trusted local services platform.
+              Whether booking for home delivery or on-site service, we guarantee quality and timely completion tailored to your needs.
+            </p>
+            <p className="text-gray-400 text-sm italic">
+              Book now and enjoy stress-free, professional service and fast delivery.
+            </p>
+          </div>
+          {/* Removed old 20 minutes fast delivery promo. Prep for new modern description. */}
 
         </div>
       </main>

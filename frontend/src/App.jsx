@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import ServiceCategories from './components/ServiceCategories';
@@ -21,7 +21,6 @@ import Swal from 'sweetalert2';
 import Footer from './components/Footer';
 import ForgotPassword from './components/ForgotPassword';
 import FoodDeliveryBookingsPage from './components/FoodDeliveryBookingsPage';
-import { API_BASE_URL } from './config/api';
 
 const Home = ({
   isAdmin,
@@ -39,6 +38,8 @@ const Home = ({
   const [availabilities, setAvailabilities] = useState({}); // userId -> availability
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAsk, setShowAsk] = useState(false);
+  const servicesRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -55,23 +56,10 @@ const Home = ({
       setLoading(true);
       try {
         const [servicesRes, usersRes, foodRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/servises`, { credentials: 'include' }),
-          fetch(`${API_BASE_URL}/user`, { credentials: 'include' }),
-          fetch(`${API_BASE_URL}/food-delivery`, { credentials: 'include' }),
+          fetch('http://${API_BASE_URL}/servises', { credentials: 'include' }),
+          fetch('http://${API_BASE_URL}/user', { credentials: 'include' }),
+          fetch('http://${API_BASE_URL}/food-delivery', { credentials: 'include' }),
         ]);
-<<<<<<< HEAD
-        
-        const servicesData = await servicesRes.json();
-        const usersData = await usersRes.json();
-        const foodData = await foodRes.json();
-        
-        // Ensure we always set arrays
-        setServices(Array.isArray(servicesData) ? servicesData : []);
-        setUsers(Array.isArray(usersData) ? usersData : []);
-        setFoodDeliveries(Array.isArray(foodData) ? foodData : []);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-=======
         const servicesData = await servicesRes.json();
         const usersData = await usersRes.json();
         const foodData = await foodRes.json();
@@ -79,7 +67,6 @@ const Home = ({
         setUsers(Array.isArray(usersData) ? usersData : []);
         setFoodDeliveries(Array.isArray(foodData) ? foodData : []);
       } catch {
->>>>>>> 444a66b90015be97610b735635a3c4798608a0a6
         setServices([]);
         setUsers([]);
         setFoodDeliveries([]);
@@ -93,7 +80,7 @@ const Home = ({
   useEffect(() => {
     const fetchAvailabilities = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/availability`, { credentials: 'include' });
+        const res = await fetch('http://${API_BASE_URL}/availability', { credentials: 'include' });
         const all = await res.json();
         // Map: userId -> first normal (not unavailable, not emergency) availability
         const map = {};
@@ -114,19 +101,17 @@ const Home = ({
 
   // User map for quick access
   const userMap = {};
-  if (Array.isArray(users)) {
-    users.forEach(user => {
-      userMap[user.id] = user;
-    });
-  }
+  users.forEach(user => {
+    userMap[user.id] = user;
+  });
 
   // Filter services to only show those for approved users
-  const approvedUserIds = Array.isArray(users) ? users.filter(u => u.approved).map(u => u.id) : [];
+  const approvedUserIds = users.filter(u => u.approved).map(u => u.id);
 
   // Service filtering (unchanged for Massage)
   let filtered = category === 'All'
-    ? (Array.isArray(services) ? services.filter(s => approvedUserIds.includes(s.userId)) : [])
-    : (Array.isArray(services) ? services.filter(s => s.category === category && approvedUserIds.includes(s.userId)) : []);
+    ? services.filter(s => approvedUserIds.includes(s.userId))
+    : services.filter(s => s.category === category && approvedUserIds.includes(s.userId));
 
   // Only show one service per user
   const seenUserIds = new Set();
@@ -155,13 +140,13 @@ const Home = ({
   let filteredFoods = [];
   if (category === 'Food Delivery') {
     const seenFoodUserIds = new Set();
-    filteredFoods = Array.isArray(foodDeliveries) ? foodDeliveries
+    filteredFoods = foodDeliveries
       .filter(fd => approvedUserIds.includes(fd.userId))
       .filter(fd => {
         if (seenFoodUserIds.has(fd.userId)) return false;
         seenFoodUserIds.add(fd.userId);
         return true;
-      }) : [];
+      });
 
     // Apply search filter to food deliveries
     if (searchQuery.trim()) {
@@ -193,7 +178,7 @@ const Home = ({
           description: s.description,
           category: s.category,
         })),
-      ...(Array.isArray(foodDeliveries) ? foodDeliveries
+      ...foodDeliveries
         .filter(fd => approvedUserIds.includes(fd.userId))
         .map(fd => ({
           ...fd,
@@ -201,7 +186,7 @@ const Home = ({
           images: fd.foodImage,
           description: fd.foodDescription,
           category: 'Food delivery',
-        })) : []),
+        })),
     ];
 
     // Sort by createdAt or id if available (adjust field as needed)
@@ -246,6 +231,21 @@ const Home = ({
       });
     }
   }
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (servicesRef.current) {
+        const rect = servicesRef.current.getBoundingClientRect();
+        if (rect.bottom < window.innerHeight - 120) {
+          setShowAsk(true);
+        } else {
+          setShowAsk(false);
+        }
+      }
+    };
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#121212] text-white flex flex-col">
@@ -336,7 +336,7 @@ const Home = ({
           <ServiceCategories selected={category} onSelect={setCategory} />
         </div>
         {/* Services */}
-        <div className="
+        <div ref={servicesRef} className="
   max-w-5xl mx-auto px-1 py-4
   grid gap-2
   grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4
@@ -417,6 +417,23 @@ const Home = ({
             )
           )}
         </div>
+        {/* Contact Us and Ask section above Footer */}
+        <div className="relative max-w-5xl mx-auto w-full">
+          <a
+            href="/feedback"
+            className="fixed left-2 bottom-20 z-40 bg-[#232323] text-[#32CD32] hover:bg-[#32CD32] hover:text-black font-bold px-5 py-2 rounded-lg shadow transition shadow-lg border border-[#32CD32]"
+            style={{ minWidth: 110 }}
+          >
+            Contact Us
+          </a>
+          {/* Ask Section - Show when user scrolls */}
+          {showAsk && (
+            <div className="fixed left-4 bottom-32 z-40 p-4 bg-[#212b21] text-white rounded-xl shadow-md border border-[#32CD32]" style={{ minWidth: 260 }}>
+              <div className="font-bold text-base mb-2">What type of service are you looking for?<br/>or would you like us to add?</div>
+              <a href="/feedback" className="inline-block mt-2 px-4 py-2 bg-[#32CD32] text-black rounded hover:bg-white hover:text-[#32CD32] font-semibold shadow">Suggest Now</a>
+            </div>
+          )}
+        </div>
       </div>
       <Footer />
     </div>
@@ -441,7 +458,7 @@ const App = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/login/me`, { credentials: 'include' });
+        const res = await fetch('http://${API_BASE_URL}/login/me', { credentials: 'include' });
         const data = await res.json();
         
         if (data.userId) {
@@ -450,7 +467,7 @@ const App = () => {
           setIsAdmin(data.role === 'admin');
 
           // New: Fetch user info for service category
-            fetch('http://localhost:3000/api/v1/user/' + data.userId)
+            fetch('http://${API_BASE_URL}/user/' + data.userId)
               .then(r => r.json())
               .then(user => {
                 setUserServiceCategory(user.serviceCategory || '');
@@ -503,7 +520,7 @@ const App = () => {
   };
 
   const handleLogout = async () => {
-    await fetch(`${API_BASE_URL}/login/logout`, {
+    await fetch('http://${API_BASE_URL}/login/logout', {
       method: 'POST',
       credentials: 'include',
     });
@@ -628,11 +645,7 @@ const App = () => {
         extra.innerHTML = `
           <button type="button" id="swal-forgot-password" class="text-[#32CD32] underline mb-2" style="background:none;border:none;cursor:pointer;">Forgot password?</button>
           <span>
-<<<<<<< HEAD
-            New to Book me?
-=======
             New to Book Me? 
->>>>>>> 444a66b90015be97610b735635a3c4798608a0a6
             <button type="button" id="swal-join-now" class="text-[#32CD32] underline" style="background:none;border:none;cursor:pointer;">Join Now</button>
           </span>
         `;
@@ -694,7 +707,7 @@ const App = () => {
       if (loginMode) {
         // Login
         try {
-          const res = await fetch(`${API_BASE_URL}/login`, {
+          const res = await fetch('http://${API_BASE_URL}/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(result.value),
@@ -726,7 +739,7 @@ if (data.user && (data.user.role === 'admin' || data.user.isAdmin)) {
             localStorage.setItem('userEmail', data.user.email || '');
             localStorage.setItem('userId', data.user.id.toString());
               // Fetch and persist user's service category so Navbar can use it immediately
-              fetch('http://localhost:3000/api/v1/user/' + data.user.id, { credentials: 'include' })
+              fetch('http://${API_BASE_URL}/user/' + data.user.id, { credentials: 'include' })
                 .then(r => r.json())
                 .then(user => {
                   const serviceCategory = user.serviceCategory || '';
@@ -750,7 +763,7 @@ if (data.user && (data.user.role === 'admin' || data.user.isAdmin)) {
         } else {
           // Register
           try {
-            const res = await fetch(`${API_BASE_URL}/user`, {
+            const res = await fetch('http://${API_BASE_URL}/user', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(result.value),
